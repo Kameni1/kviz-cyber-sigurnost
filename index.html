@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber sigurnost – Kviz od 50 pitanja</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #111827, #1e293b);
+      color: #f8fafc;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 950px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .subtitle {
+      color: #cbd5e1;
+      margin-bottom: 18px;
+    }
+    .progress-wrap {
+      margin: 18px 0 24px;
+    }
+    .progress-text {
+      margin-bottom: 8px;
+      color: #cbd5e1;
+      font-weight: bold;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #334155;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #38bdf8);
+      transition: width 0.3s ease;
+    }
+    .question-number {
+      color: #38bdf8;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .question-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+    .answers {
+      display: grid;
+      gap: 12px;
+    }
+    .answer-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-size: 1rem;
+    }
+    .answer-btn:hover:not(:disabled) {
+      background: #334155;
+      transform: translateY(-1px);
+    }
+    .answer-btn.correct {
+      background: #14532d;
+      border-color: #22c55e;
+    }
+    .answer-btn.wrong {
+      background: #7f1d1d;
+      border-color: #ef4444;
+    }
+    .answer-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.95;
+    }
+    .explanation {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #0f172a;
+      border-left: 5px solid #38bdf8;
+      display: none;
+    }
+    .explanation strong {
+      color: #facc15;
+    }
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button.primary, button.secondary {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.primary {
+      background: #22c55e;
+      color: #052e16;
+    }
+    button.primary:hover {
+      background: #4ade80;
+    }
+    button.secondary {
+      background: #38bdf8;
+      color: #082f49;
+    }
+    button.secondary:hover {
+      background: #67e8f9;
+    }
+    .hidden {
+      display: none;
+    }
+    .score-box {
+      font-size: 1.1rem;
+      margin: 16px 0;
+      padding: 16px;
+      border-radius: 12px;
+      background: #0f172a;
+      border: 1px solid #334155;
+    }
+    .result-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #1e293b;
+      border: 1px solid #475569;
+    }
+    .review-list {
+      margin-top: 24px;
+      display: grid;
+      gap: 16px;
+    }
+    .review-item {
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .review-item h4 {
+      margin: 0 0 10px;
+      color: #f8fafc;
+    }
+    .review-item p {
+      margin: 6px 0;
+      color: #cbd5e1;
+    }
+    .good { color: #4ade80; font-weight: bold; }
+    .bad { color: #f87171; font-weight: bold; }
+    .small-note {
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+    footer {
+      margin-top: 20px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 640px) {
+      .question-text { font-size: 1.08rem; }
+      .answer-btn { font-size: 0.97rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="startScreen">
+      <h1>Cyber sigurnost – Kviz od 50 pitanja</h1>
+      <p class="subtitle">
+        Ovaj kviz pokriva najvažnije prijetnje i situacije: phishing, smishing, vishing,
+        lažni RPC, malware, ransomware, lozinke, 2FA, Wi-Fi, USB, kripto sigurnost,
+        društveni inženjering, backup, ažuriranja i pravilno donošenje odluka.
+      </p>
+      <p>
+        Cilj je da osoba nakon rješavanja kviza bolje prepoznaje napad, zna gdje je opasnost
+        i što je najsigurniji potez.
+      </p>
+      <div class="actions">
+        <button class="primary" onclick="startQuiz()">Pokreni kviz</button>
+      </div>
+      <p class="small-note">
+        Savjet: ne gledaj samo rezultat. Najviše vrijedi pročitati objašnjenja.
+      </p>
+    </div>
+
+    <div class="card hidden" id="quizScreen">
+      <div class="progress-wrap">
+        <div class="progress-text" id="progressText">Pitanje 1 / 50</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="question-number" id="questionNumber"></div>
+      <div class="question-text" id="questionText"></div>
+
+      <div class="answers" id="answersContainer"></div>
+
+      <div class="explanation" id="explanationBox"></div>
+
+      <div class="actions">
+        <button class="secondary hidden" id="nextBtn" onclick="nextQuestion()">Sljedeće pitanje</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="resultScreen">
+      <h2>Rezultat kviza</h2>
+      <div class="score-box" id="scoreBox"></div>
+      <div class="actions">
+        <button class="primary" onclick="restartQuiz()">Riješi ponovno</button>
+      </div>
+
+      <div id="reviewSection">
+        <h3 style="margin-top:24px;">Pitanja koja trebaš ponoviti</h3>
+        <div class="review-list" id="reviewList"></div>
+      </div>
+    </div>
+
+    <footer>
+      Kviz je napravljen kao jedan HTML dokument, pogodan za GitHub Pages ili lokalno korištenje.
+    </footer>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Što je phishing?",
+        answers: [
+          "Vrsta fizičkog napada na server sobu",
+          "Pokušaj prevare kojim napadač lažnim porukama želi izvući lozinke, kodove ili novac",
+          "Službeni sigurnosni protokol za banke",
+          "Način bržeg interneta"
+        ],
+        correct: 1,
+        explanation: "Phishing je digitalna prijevara u kojoj napadač glumi banku, servis, kolegu ili drugu pouzdanu stranu kako bi žrtva sama predala podatke ili novac."
+      },
+      {
+        question: "Koji je najbolji prvi korak kada dobiješ sumnjiv email s linkom za hitnu prijavu?",
+        answers: [
+          "Odmah kliknuti da vidiš o čemu je riječ",
+          "Proslijediti prijateljima da provjere",
+          "Ne klikati, provjeriti pošiljatelja i po potrebi otvoriti službenu stranicu ručno",
+          "Odgovoriti mailom i pitati je li poruka stvarna"
+        ],
+        correct: 2,
+        explanation: "Najsigurnije je ne klikati direktno. Umjesto toga sam upiši službenu adresu u preglednik ili provjeri kroz službenu aplikaciju."
+      },
+      {
+        question: "Što je smishing?",
+        answers: [
+          "Napad preko SMS poruka",
+          "Napad preko USB sticka",
+          "Napad preko Bluetooth zvučnika",
+          "Vrsta antivirusnog programa"
+        ],
+        correct: 0,
+        explanation: "Smishing je phishing putem SMS poruka. Cilj je navesti osobu da klikne link, nazove broj ili preda kodove i podatke."
+      },
+      {
+        question: "Što je vishing?",
+        answers: [
+          "Prevara putem glasovnog poziva",
+          "Sigurnosno kopiranje podataka",
+          "Šifriranje diska",
+          "Digitalni potpis dokumenata"
+        ],
+        correct: 0,
+        explanation: "Vishing je voice phishing. Napadač telefonom glumi banku, tehničku podršku, policiju ili dostavnu službu i pokušava iznuditi podatke ili uplatu."
+      },
+      {
+        question: "Koja lozinka je najsigurnija?",
+        answers: [
+          "12345678",
+          "ImePrezime2026",
+          "Zagreb!",
+          "M0j!Plavi-KonJ_94#Sunce"
+        ],
+        correct: 3,
+        explanation: "Jaka lozinka je duga, nepredvidiva i jedinstvena. Još bolje je koristiti upravitelj lozinki i stvarati zasebne lozinke za svaki servis."
+      },
+      {
+        question: "Zašto je opasno koristiti istu lozinku na više mjesta?",
+        answers: [
+          "Jer internet tada postaje sporiji",
+          "Jer ako jedan servis procuri, napadač može probati istu lozinku na drugim računima",
+          "Jer računalo može izgubiti boju slike",
+          "Jer antivirus to zabranjuje"
+        ],
+        correct: 1,
+        explanation: "To se zove credential stuffing. Kad procuri jedna lozinka, napadači automatizirano pokušavaju ulaz na email, banku, društvene mreže i druge servise."
+      },
+      {
+        question: "Što je najbolja praksa za pohranu lozinki?",
+        answers: [
+          "Držati sve lozinke u običnom tekstualnom fajlu na desktopu",
+          "Pisati ih u chatu prijatelju",
+          "Koristiti password manager i jaku glavnu lozinku",
+          "Koristiti istu lozinku da se lakše pamti"
+        ],
+        correct: 2,
+        explanation: "Password manager omogućuje jake i različite lozinke bez potrebe da ih pamtiš ručno."
+      },
+      {
+        question: "Što je 2FA ili MFA?",
+        answers: [
+          "Druga verzija Facebook aplikacije",
+          "Dodatni sloj prijave uz lozinku, npr. kod ili sigurnosni ključ",
+          "Format slike",
+          "Vrsta firewall uređaja"
+        ],
+        correct: 1,
+        explanation: "2FA/MFA znači da lozinka sama nije dovoljna. Potreban je još jedan faktor, što napadaču znatno otežava provalu."
+      },
+      {
+        question: "Koja je opcija obično sigurnija za 2FA?",
+        answers: [
+          "Kodovi iz autentikatorske aplikacije ili hardverski sigurnosni ključ",
+          "Nikakav 2FA",
+          "Slanje lozinke emailom samome sebi",
+          "Javna objava rezervnih kodova"
+        ],
+        correct: 0,
+        explanation: "SMS 2FA je bolji nego ništa, ali autentikatorske aplikacije i sigurnosni ključevi su obično sigurniji."
+      },
+      {
+        question: "Što je lažni RPC u kripto okruženju?",
+        answers: [
+          "Službeni državni certifikat",
+          "Lažna ili kompromitirana mrežna točka koja može prikazivati krive podatke ili navoditi korisnika na opasne radnje",
+          "Vrsta hardverskog novčanika",
+          "Format privatnog ključa"
+        ],
+        correct: 1,
+        explanation: "Lažni RPC može korisniku pokazivati lažno stanje, krive adrese ili ga navoditi na potpisivanje opasnih transakcija. Treba koristiti samo provjerene službene RPC adrese."
+      },
+      {
+        question: "Ako aplikacija za wallet traži da dodaš novi RPC, što je najsigurnije učiniti?",
+        answers: [
+          "Unijeti bilo koji RPC s Telegram komentara",
+          "Koristiti prvi rezultat koji iskoči na tražilici bez provjere",
+          "Provjeriti službenu dokumentaciju projekta i koristiti samo potvrđeni RPC",
+          "Pitati anonimni profil bez ikakve provjere"
+        ],
+        correct: 2,
+        explanation: "RPC mora doći iz službenog izvora projekta ili druge pouzdane dokumentacije, ne iz nasumičnih grupa i komentara."
+      },
+      {
+        question: "Koja je najveća opasnost kada netko traži tvoju seed frazu?",
+        answers: [
+          "Može samo vidjeti povijest transakcija",
+          "Može preuzeti potpunu kontrolu nad walletom i sredstvima",
+          "Može samo promijeniti pozadinu aplikacije",
+          "Ne može napraviti ništa važno"
+        ],
+        correct: 1,
+        explanation: "Seed fraza je glavni ključ cijelog walleta. Tko ima seed frazu, obično ima potpunu kontrolu nad sredstvima."
+      },
+      {
+        question: "Tko smije tražiti tvoju seed frazu ili privatni ključ?",
+        answers: [
+          "Samo admin iz Telegram grupe",
+          "Samo tehnička podrška ako zvuči uvjerljivo",
+          "Nitko",
+          "Bilo koji moderator"
+        ],
+        correct: 2,
+        explanation: "Legitimna podrška nikada ne treba tvoju seed frazu ni privatni ključ. To se ne dijeli ni s kim."
+      },
+      {
+        question: "Što je ransomware?",
+        answers: [
+          "Program za kompresiju datoteka",
+          "Zlonamjerni softver koji zaključava ili šifrira podatke i traži otkupninu",
+          "Vrsta Wi-Fi rutera",
+          "Sustav za backup"
+        ],
+        correct: 1,
+        explanation: "Ransomware može zaključati cijelo računalo ili podatke i tražiti plaćanje. Najbolja obrana su backup, oprez i ažuriranja."
+      },
+      {
+        question: "Koja je najbolja obrana od gubitka podataka nakon ransomware napada?",
+        answers: [
+          "Držati samo jednu kopiju važnih podataka na istom računalu",
+          "Imati redovite odvojene sigurnosne kopije",
+          "Gasiti monitor kad nisi doma",
+          "Ne koristiti mape"
+        ],
+        correct: 1,
+        explanation: "Backup koji nije stalno spojen na isto računalo omogućuje oporavak bez plaćanja otkupnine."
+      },
+      {
+        question: "Što je društveni inženjering?",
+        answers: [
+          "Pisanje programa za robote",
+          "Manipulacija ljudima da sami otkriju podatke ili naprave štetnu radnju",
+          "Popravak računala",
+          "Kriptiranje emaila"
+        ],
+        correct: 1,
+        explanation: "Najslabija točka često nije tehnologija nego čovjek. Napadači koriste hitnost, autoritet, strah, pohlepu i znatiželju."
+      },
+      {
+        question: "Dobiješ poziv: 'Ja sam iz banke, odmah mi recite kod koji vam je stigao SMS-om.' Što je ispravno?",
+        answers: [
+          "Odmah reći kod jer banka zna što radi",
+          "Prekinuti poziv i sam nazvati službeni broj banke",
+          "Poslati i broj kartice za svaki slučaj",
+          "Zamoliti ih da nazovu sutra"
+        ],
+        correct: 1,
+        explanation: "Kodovi za prijavu i potvrdu transakcije ne daju se preko poziva nepoznatoj osobi. Treba sam nazvati službeni kontakt banke."
+      },
+      {
+        question: "Zašto je opasno klikati na privitke iz neočekivanih emailova?",
+        answers: [
+          "Jer mogu sadržavati malware ili skripte za infekciju",
+          "Jer troše boju ekrana",
+          "Jer brišu Wi-Fi signal",
+          "Jer povećavaju cijenu interneta"
+        ],
+        correct: 0,
+        explanation: "Privitci mogu sadržavati zlonamjerne dokumente, makroe, izvršne datoteke ili skriveni kod."
+      },
+      {
+        question: "Koji je znak da je web stranica možda lažna?",
+        answers: [
+          "Domena je čudna, s greškama ili dodatnim slovima",
+          "Ima logo poznate tvrtke",
+          "Ima plavu boju",
+          "Otvara se u pregledniku"
+        ],
+        correct: 0,
+        explanation: "Napadači često koriste domene koje na prvi pogled sliče pravima, ali imaju sitne razlike: npr. zamijenjena slova, crtice ili dodatne riječi."
+      },
+      {
+        question: "Je li ikona lokota u pregledniku sama po sebi dokaz da je stranica sigurna?",
+        answers: [
+          "Da, uvijek",
+          "Ne, lokot samo znači da je veza šifrirana, ali stranica i dalje može biti zlonamjerna",
+          "Da, jer je to potvrdila banka",
+          "Lokot znači da stranica nema vlasnika"
+        ],
+        correct: 1,
+        explanation: "HTTPS štiti prijenos podataka, ali ne jamči da je vlasnik stranice pošten. I prevaranti mogu imati HTTPS."
+      },
+      {
+        question: "Što je najbolja reakcija na 'hitnu' poruku da ti je račun blokiran i moraš kliknuti odmah?",
+        answers: [
+          "Kliknuti odmah zbog hitnosti",
+          "Poslati prijatelju da on klikne",
+          "Zastati, provjeriti poruku i otići na službenu stranicu ručno",
+          "Unijeti sve podatke da ne nastane problem"
+        ],
+        correct: 2,
+        explanation: "Hitnost je klasična metoda manipulacije. Prvo stani, provjeri i idi samo kroz službeni kanal."
+      },
+      {
+        question: "Zašto su javne Wi-Fi mreže rizične?",
+        answers: [
+          "Jer uvijek imaju spor internet",
+          "Jer na njima napadač može pokušati presretanje prometa ili lažnu pristupnu točku",
+          "Jer brišu datoteke s mobitela automatski",
+          "Jer gase Bluetooth"
+        ],
+        correct: 1,
+        explanation: "Na javnom Wi-Fi-ju treba izbjegavati osjetljive prijave ako nije nužno, te koristiti HTTPS i po mogućnosti VPN iz pouzdanog izvora."
+      },
+      {
+        question: "Što je lažni Wi-Fi hotspot?",
+        answers: [
+          "Prava mreža s jačim signalom",
+          "Namjerno postavljena mreža koja imitira legitimni Wi-Fi da bi ljudi spojili uređaj",
+          "Sigurna mreža hotela",
+          "Nova verzija rutera"
+        ],
+        correct: 1,
+        explanation: "Napadač može postaviti mrežu s imenom sličnim hotelu, kafiću ili aerodromu i presretati korisnike."
+      },
+      {
+        question: "Zašto treba redovito ažurirati operativni sustav i aplikacije?",
+        answers: [
+          "Zbog izgleda ikonica",
+          "Jer ažuriranja često zatvaraju poznate sigurnosne rupe",
+          "Jer bez toga zvuk ne radi",
+          "Samo da bi proizvođač zaradio"
+        ],
+        correct: 1,
+        explanation: "Zastarjeli sustavi često imaju poznate ranjivosti koje napadači aktivno iskorištavaju."
+      },
+      {
+        question: "Je li sigurno instalirati 'crack' ili piratski program s neprovjerenog izvora?",
+        answers: [
+          "Da, ako izgleda profesionalno",
+          "Da, ako ga je preporučio anonimni korisnik",
+          "Ne, to je čest način širenja malwarea i trojanaca",
+          "Da, ako je besplatan"
+        ],
+        correct: 2,
+        explanation: "Piratski softver i crack alati vrlo često dolaze s trojancima, stealerima i backdoorima."
+      },
+      {
+        question: "Što je trojanac?",
+        answers: [
+          "Program koji se predstavlja kao koristan, a u pozadini radi zlonamjerne radnje",
+          "Samo antivirusni alat",
+          "Vrsta monitora",
+          "Web preglednik"
+        ],
+        correct: 0,
+        explanation: "Trojanac se često maskira u legitimni program ili privitak kako bi korisnik sam pokrenuo infekciju."
+      },
+      {
+        question: "Što je keylogger?",
+        answers: [
+          "Program koji snima pritiske tipki i može krasti lozinke",
+          "Aplikacija za bolje tipkanje",
+          "Mehanička tipkovnica",
+          "Program za osvjetljenje tipki"
+        ],
+        correct: 0,
+        explanation: "Keylogger može pratiti što upisuješ, uključujući lozinke, poruke i druge osjetljive podatke."
+      },
+      {
+        question: "Nepoznati USB stick nađeš ispred firme ili kuće. Što je najsigurnije?",
+        answers: [
+          "Uštekati ga i pogledati što je unutra",
+          "Dati djetetu da otvori",
+          "Ne spajati ga na uređaj; predati ga odgovornoj osobi ili sigurno zbrinuti",
+          "Odmah ga formatirati na vlastitom računalu"
+        ],
+        correct: 2,
+        explanation: "USB uređaji mogu sadržavati malware ili biti posebno pripremljeni za napad čim ih spojiš."
+      },
+      {
+        question: "Što je najmanje sigurno mjesto za spremanje seed fraze?",
+        answers: [
+          "Na papiru na sigurnom mjestu",
+          "U metalnoj backup pločici",
+          "U screenshotu ili običnoj bilješci na telefonu spojenom na internet",
+          "U fizičkom sefu"
+        ],
+        correct: 2,
+        explanation: "Digitalne kopije na online uređaju mogu biti ukradene malwareom, cloud sinkronizacijom ili probojem računa."
+      },
+      {
+        question: "Zašto su QR kodovi ponekad opasni?",
+        answers: [
+          "Jer uvijek oštećuju kameru",
+          "Jer mogu voditi na zlonamjernu stranicu ili lažnu uplatu",
+          "Jer troše bateriju samo kad su legalni",
+          "Jer ne rade na novim telefonima"
+        ],
+        correct: 1,
+        explanation: "QR kod skriva odredište. Prije potvrde treba provjeriti kamo vodi i kakvu radnju traži."
+      },
+      {
+        question: "Što treba provjeriti prije potpisivanja kripto transakcije?",
+        answers: [
+          "Samo boju aplikacije",
+          "Ništa, dovoljno je vjerovati aplikaciji",
+          "Adresu, mrežu, iznos, dozvole i što točno potpisuješ",
+          "Samo logo tokena"
+        ],
+        correct: 2,
+        explanation: "Mnoge prevare uspijevaju zato što korisnik ne pročita što potpisuje: allowance, permit, approval ili slanje na krivu adresu."
+      },
+      {
+        question: "Što znači kada dApp traži 'unlimited approval' za token?",
+        answers: [
+          "Da aplikacija može trošiti veliku ili neograničenu količinu tog tokena",
+          "Da transakcija neće uspjeti",
+          "Da dobivaš bonus",
+          "Da se token automatski udvostručuje"
+        ],
+        correct: 0,
+        explanation: "Unlimited approval može biti praktičan, ali i rizičan. Ako je dApp zlonamjeran ili kompromitiran, može isprazniti odobreni token."
+      },
+      {
+        question: "Što je najbolja praksa nakon korištenja sumnjivog ili više nepotrebnog dApp odobrenja?",
+        answers: [
+          "Ništa, odobrenje ostaje zauvijek",
+          "Opozvati odnosno revoke odobrenja koja nisu potrebna",
+          "Poslati seed frazu podršci",
+          "Promijeniti boju walleta"
+        ],
+        correct: 1,
+        explanation: "Povremeni pregled i opoziv nepotrebnih odobrenja smanjuje rizik od buduće zloupotrebe."
+      },
+      {
+        question: "Koja je dobra praksa za email račun?",
+        answers: [
+          "Koristiti ga kao glavni račun bez 2FA",
+          "Imati jaku lozinku i uključiti 2FA jer email resetira druge račune",
+          "Objaviti lozinku obitelji u grupi",
+          "Prijavljivati se samo u internet kafiću"
+        ],
+        correct: 1,
+        explanation: "Email je često ključ svih drugih računa. Tko preuzme email, može resetirati mnoge druge lozinke."
+      },
+      {
+        question: "Što je spoofing pošiljatelja?",
+        answers: [
+          "Kada napadač lažira identitet pošiljatelja poruke",
+          "Kada pošiljatelj koristi emoji",
+          "Kada je server prespor",
+          "Kada korisnik promijeni profilnu sliku"
+        ],
+        correct: 0,
+        explanation: "Napadač može pokušati da poruka izgleda kao da dolazi od kolege, banke ili poznate firme."
+      },
+      {
+        question: "Kolega šalje poruku: 'Hitno uplati ovo danas i ne zovi me, na sastanku sam.' Što je ispravno?",
+        answers: [
+          "Odmah platiti jer je hitno",
+          "Provjeriti drugim kanalom je li zahtjev stvaran",
+          "Poslati i svoje pristupne podatke",
+          "Ignorirati sve poruke kolega zauvijek"
+        ],
+        correct: 1,
+        explanation: "To je čest oblik poslovne prevare. Financijske i osjetljive radnje treba potvrditi neovisnim kanalom."
+      },
+      {
+        question: "Zašto nije pametno objavljivati previše osobnih podataka javno na društvenim mrežama?",
+        answers: [
+          "Jer usporava punjenje mobitela",
+          "Jer ti podaci mogu pomoći napadaču u pogađanju sigurnosnih pitanja, prijevari ili krađi identiteta",
+          "Jer društvene mreže ne rade vikendom",
+          "Jer se slike onda brišu"
+        ],
+        correct: 1,
+        explanation: "Rođendani, kućni ljubimci, škola, adresa i slični podaci mogu pomoći u socijalnom inženjeringu."
+      },
+      {
+        question: "Što je sigurno ponašanje kod preuzimanja aplikacija na mobitel?",
+        answers: [
+          "Instalirati sve APK fajlove iz nepoznatih grupa",
+          "Koristiti službene trgovine ili vrlo pouzdane izvore i provjeriti dozvole",
+          "Isključiti sva upozorenja sustava",
+          "Davati aplikaciji sve dozvole bez čitanja"
+        ],
+        correct: 1,
+        explanation: "Aplikacije treba preuzimati iz pouzdanih izvora i gledati traže li pretjerane dozvole."
+      },
+      {
+        question: "Ako aplikacija za lampu traži pristup kontaktima, mikrofonu i SMS porukama, to znači da:",
+        answers: [
+          "To je sasvim normalno",
+          "Treba biti sumnjičav jer dozvole ne odgovaraju svrsi aplikacije",
+          "Aplikacija radi brže",
+          "To je obvezno po zakonu"
+        ],
+        correct: 1,
+        explanation: "Dozvole trebaju imati smisla u odnosu na funkciju aplikacije. Pretjerane dozvole su crvena zastava."
+      },
+      {
+        question: "Što je najbolje učiniti ako misliš da si kliknuo zlonamjerni link i unio lozinku?",
+        answers: [
+          "Ništa, čekati par dana",
+          "Odmah promijeniti lozinku, odjaviti druge sesije i uključiti 2FA ako već nije uključena",
+          "Objaviti to javno na forumu s lozinkom",
+          "Samo ugasiti ekran"
+        ],
+        correct: 1,
+        explanation: "Brza reakcija smanjuje štetu. Po potrebi treba promijeniti i lozinku emaila te provjeriti povezane račune."
+      },
+      {
+        question: "Što je sigurnosna kopija 3-2-1?",
+        answers: [
+          "Tri monitora, dva rutera, jedan antivirus",
+          "Tri kopije podataka, na dva različita medija, od kojih je jedna odvojena/offline",
+          "Tri lozinke za jedan račun",
+          "Tri puta restart računala"
+        ],
+        correct: 1,
+        explanation: "Pravilo 3-2-1 značajno povećava šansu da nakon incidenta možeš vratiti podatke."
+      },
+      {
+        question: "Je li dovoljno osloniti se samo na antivirus?",
+        answers: [
+          "Da, antivirus rješava sve",
+          "Ne, potreban je i oprez korisnika, ažuriranja, backup i dobre navike",
+          "Da, ako je računalo crne boje",
+          "Da, ako nikad ne koristiš miš"
+        ],
+        correct: 1,
+        explanation: "Sigurnost je slojevita. Antivirus pomaže, ali ne može nadomjestiti loše odluke korisnika."
+      },
+      {
+        question: "Što je najmanje pametno raditi s administrativnim računom na računalu?",
+        answers: [
+          "Koristiti obični korisnički račun za svakodnevni rad kad je moguće",
+          "Raditi sve svakodnevne aktivnosti stalno kao administrator",
+          "Ažurirati sustav",
+          "Zaključati ekran kad odlaziš"
+        ],
+        correct: 1,
+        explanation: "Ako malware uđe dok radiš kao administrator, često ima veće ovlasti i veći doseg štete."
+      },
+      {
+        question: "Što znači 'zero trust' pristup u sigurnosti u jednostavnom smislu?",
+        answers: [
+          "Nikome se ne vjeruje slijepo; pristup se stalno provjerava prema potrebi i kontekstu",
+          "Da treba odbaciti sav internet",
+          "Da se koriste nula lozinki",
+          "Da je sigurnost nemoguća"
+        ],
+        correct: 0,
+        explanation: "Princip je da se pristup ne daje samo zato što je netko 'unutra', nego se provjerava identitet, uređaj i pravo pristupa."
+      },
+      {
+        question: "Što je dobar znak prevare u oglasu za ulaganje ili kripto projekt?",
+        answers: [
+          "Zagarantirana velika zarada bez rizika i uz hitan pritisak da uplatiš odmah",
+          "Jasna dokumentacija i upozorenje na rizike",
+          "Otvoren kod i neovisne provjere",
+          "Normalno objašnjen poslovni model"
+        ],
+        correct: 0,
+        explanation: "Obećanje sigurne i visoke zarade bez rizika je jedna od najčešćih crvenih zastava."
+      },
+      {
+        question: "Ako ti netko pošalje 'support' link preko privatne poruke na društvenoj mreži ili Telegramu, što je najbolje?",
+        answers: [
+          "Otvoriti bez razmišljanja jer je support",
+          "Tražiti još i seed frazu da ubrzaš postupak",
+          "Ignorirati link i otići samo na službeni kanal projekta",
+          "Instalirati sve što link predloži"
+        ],
+        correct: 2,
+        explanation: "Lažni support profili su vrlo česti, posebno u kripto prostoru. Podršku traži isključivo kroz službene kanale."
+      },
+      {
+        question: "Koji je ispravan odnos prema rezervnim 2FA kodovima?",
+        answers: [
+          "Objaviti ih u email draftu",
+          "Spremiti ih sigurno i odvojeno, jer mogu pomoći u povratu pristupa",
+          "Poslati ih svakom administratoru grupe",
+          "Nisu važni"
+        ],
+        correct: 1,
+        explanation: "Rezervni kodovi služe za hitan povrat pristupa ako izgubiš uređaj, pa moraju biti sigurno spremljeni."
+      },
+      {
+        question: "Zašto je opasno ostaviti uređaj otključan bez nadzora?",
+        answers: [
+          "Jer netko može fizički pristupiti računima, podacima ili instalirati nešto zlonamjerno",
+          "Jer ekran postaje tamniji",
+          "Jer Wi-Fi nestane",
+          "Jer tipkovnica zaboravi slova"
+        ],
+        correct: 0,
+        explanation: "Fizički pristup često znači i vrlo ozbiljan sigurnosni rizik. Zaključavanje uređaja je osnovna zaštita."
+      },
+      {
+        question: "Što je najbolja praksa za kućni Wi-Fi ruter?",
+        answers: [
+          "Ostaviti zadanu administratorsku lozinku",
+          "Promijeniti zadanu lozinku, ažurirati firmware i koristiti jaku Wi-Fi zaštitu",
+          "Objaviti lozinku susjedima",
+          "Držati ruter stalno otvoren bez zaporke"
+        ],
+        correct: 1,
+        explanation: "Zadane lozinke i stari firmware čine ruter lakom metom. Ruter je važna točka cijele mreže."
+      },
+      {
+        question: "Ako web stranica ili aplikacija traži više podataka nego što je potrebno za radnju koju radiš, što trebaš pomisliti?",
+        answers: [
+          "To je sigurno zbog kvalitete usluge",
+          "Treba biti oprezan i pitati se zašto im to treba",
+          "Odmah dati i dodatne podatke",
+          "To je uvijek zakonska obveza"
+        ],
+        correct: 1,
+        explanation: "Načelo minimalnog dijeljenja podataka je važno. Daj samo ono što je stvarno nužno."
+      },
+      {
+        question: "Koji je najbolji odgovor na poruku: 'Osvojio si nagradu, samo plati malu naknadu odmah'?",
+        answers: [
+          "Platiti odmah jer je šteta propustiti",
+          "To je vrlo vjerojatno prevara; ne plaćati i provjeriti izvor",
+          "Poslati i broj kartice da bude brže",
+          "Zamoliti ih da dupliraju iznos"
+        ],
+        correct: 1,
+        explanation: "Lažne nagrade i tombole često služe za krađu novca i podataka. Nagrada koja traži hitnu uplatu je sumnjiva."
+      },
+      {
+        question: "Što je najvažnije pravilo kada osjetiš pritisak, hitnost ili strah u digitalnoj komunikaciji?",
+        answers: [
+          "Djelovati što brže bez razmišljanja",
+          "Zaustaviti se, provjeriti činjenice i koristiti službeni kanal",
+          "Poslati podatke da problem nestane",
+          "Obrisati cijeli uređaj bez provjere"
+        ],
+        correct: 1,
+        explanation: "Mnogo napada uspije upravo zato što žrtva reagira emocionalno i prebrzo. Pauza i provjera često sprječavaju štetu."
+      },
+      {
+        question: "Koja je najzdravija sigurnosna navika od svih ponuđenih?",
+        answers: [
+          "Vjerovati svemu što izgleda profesionalno",
+          "Koristiti isti obrazac ponašanja: provjeri pošiljatelja, domenu, zahtjev, hitnost i službeni izvor",
+          "Klikati prvo pa misliti poslije",
+          "Držati sve zaštitne kodove u chatu"
+        ],
+        correct: 1,
+        explanation: "Najveća zaštita nije jedan alat nego navika provjere prije svake osjetljive radnje."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selected = false;
+    let incorrectAnswers = [];
+
+    function startQuiz() {
+      document.getElementById("startScreen").classList.add("hidden");
+      document.getElementById("quizScreen").classList.remove("hidden");
+      currentQuestion = 0;
+      score = 0;
+      incorrectAnswers = [];
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      selected = false;
+      const q = quizData[currentQuestion];
+
+      document.getElementById("questionNumber").textContent = `Tema sigurnosti #${currentQuestion + 1}`;
+      document.getElementById("questionText").textContent = q.question;
+      document.getElementById("progressText").textContent = `Pitanje ${currentQuestion + 1} / ${quizData.length}`;
+      document.getElementById("progressFill").style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+
+      const answersContainer = document.getElementById("answersContainer");
+      answersContainer.innerHTML = "";
+
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = answer;
+        btn.onclick = () => selectAnswer(index, btn);
+        answersContainer.appendChild(btn);
+      });
+
+      document.getElementById("explanationBox").style.display = "none";
+      document.getElementById("explanationBox").innerHTML = "";
+      document.getElementById("nextBtn").classList.add("hidden");
+    }
+
+    function selectAnswer(index, btn) {
+      if (selected) return;
+      selected = true;
+
+      const q = quizData[currentQuestion];
+      const buttons = document.querySelectorAll(".answer-btn");
+
+      buttons.forEach((button, i) => {
+        button.disabled = true;
+        if (i === q.correct) {
+          button.classList.add("correct");
+        }
+      });
+
+      if (index === q.correct) {
+        score++;
+      } else {
+        btn.classList.add("wrong");
+        incorrectAnswers.push({
+          question: q.question,
+          yourAnswer: q.answers[index],
+          correctAnswer: q.answers[q.correct],
+          explanation: q.explanation
+        });
+      }
+
+      const explanationBox = document.getElementById("explanationBox");
+      explanationBox.style.display = "block";
+      explanationBox.innerHTML = `
+        <strong>Objašnjenje:</strong> ${q.explanation}
+      `;
+
+      document.getElementById("nextBtn").classList.remove("hidden");
+      document.getElementById("progressFill").style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < quizData.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function getLevel(percent) {
+      if (percent >= 90) return "Odličan rezultat – vrlo dobra razina svijesti o cyber sigurnosti.";
+      if (percent >= 75) return "Vrlo dobar rezultat – dobro prepoznaješ većinu prijetnji, ali vrijedi još utvrditi detalje.";
+      if (percent >= 60) return "Dobar temelj – znaš dosta, ali još postoje rupe koje napadač može iskoristiti.";
+      if (percent >= 40) return "Srednja razina rizika – trebaš ozbiljno ponoviti teme i objašnjenja.";
+      return "Visok rizik – obavezno prođi objašnjenja i ponovi kviz.";
+    }
+
+    function showResults() {
+      document.getElementById("quizScreen").classList.add("hidden");
+      document.getElementById("resultScreen").classList.remove("hidden");
+
+      const percent = Math.round((score / quizData.length) * 100);
+      document.getElementById("scoreBox").innerHTML = `
+        <p><strong>Točni odgovori:</strong> ${score} / ${quizData.length}</p>
+        <p><strong>Postotak:</strong> ${percent}%</p>
+        <div class="result-badge">${getLevel(percent)}</div>
+      `;
+
+      const reviewList = document.getElementById("reviewList");
+      reviewList.innerHTML = "";
+
+      if (incorrectAnswers.length === 0) {
+        document.getElementById("reviewSection").innerHTML = `
+          <h3 style="margin-top:24px;">Savršeno</h3>
+          <div class="review-item">
+            <p class="good">Nema netočnih odgovora. Prošao si kviz bez greške.</p>
+            <p>Ipak je dobro povremeno ponovno proći pitanja jer se najbolja sigurnost temelji na navikama, ne samo na znanju.</p>
+          </div>
+        `;
+        return;
+      }
+
+      incorrectAnswers.forEach((item, idx) => {
+        const div = document.createElement("div");
+        div.className = "review-item";
+        div.innerHTML = `
+          <h4>${idx + 1}. ${item.question}</h4>
+          <p><span class="bad">Tvoj odgovor:</span> ${item.yourAnswer}</p>
+          <p><span class="good">Točan odgovor:</span> ${item.correctAnswer}</p>
+          <p><strong>Zašto:</strong> ${item.explanation}</p>
+        `;
+        reviewList.appendChild(div);
+      });
+    }
+
+    function restartQuiz() {
+      document.getElementById("resultScreen").classList.add("hidden");
+      document.getElementById("startScreen").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
